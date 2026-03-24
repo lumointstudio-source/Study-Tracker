@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Council Exam Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+:root {
+  --bg: #050d1a;
+  --surface: #0d1f3c;
+  --surface2: #112547;
+  --border: #1e3560;
+  --blue1: #1a3a6e;
+  --blue2: #2563eb;
+  --blue3: #60a5fa;
+  --blue4: #bfdbfe;
+  --text: #e2eaf5;
+  --muted: #6b8ab0;
+  --success: #22d3ee;
+  --danger: #f87171;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 20px 16px 80px;
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(37,99,235,0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(96,165,250,0.07) 0%, transparent 50%);
+}
+
+.wrap { max-width: 420px; margin: 0 auto; }
+
+/* Header */
+.header { text-align:center; margin-bottom:24px; padding-top:8px; }
+.tag {
+  display:inline-block;
+  background:rgba(59,130,246,0.15); border:1px solid rgba(59,130,246,0.3);
+  color:var(--blue3); font-size:11px; font-weight:600; letter-spacing:2px;
+  text-transform:uppercase; padding:5px 14px; border-radius:20px; margin-bottom:12px;
+}
+h1 { font-size:26px; font-weight:800; }
+h1 span { color:var(--blue3); }
+.sub { color:var(--muted); font-size:13px; margin-top:5px; }
+
+/* Countdown */
+.countdown { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
+.cd {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:14px; padding:14px 8px; text-align:center;
+}
+.cd-n {
+  font-size:32px; font-weight:800; line-height:1;
+  background:linear-gradient(135deg,#60a5fa,#2563eb);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.cd-l { font-size:10px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-top:4px; }
+
+/* Cards */
+.card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:18px; padding:20px; margin-bottom:14px;
+}
+.card-label {
+  font-size:10px; font-weight:700; letter-spacing:2px;
+  text-transform:uppercase; color:var(--muted); margin-bottom:14px;
+}
+
+/* Progress */
+.prog-row { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; }
+.prog-time { font-size:28px; font-weight:800; }
+.prog-goal { font-size:13px; color:var(--muted); }
+.bar { background:var(--surface2); border-radius:99px; height:14px; overflow:hidden; }
+.bar-inner {
+  height:100%; border-radius:99px; width:0%;
+  background:linear-gradient(90deg,#1d4ed8,#3b82f6,#60a5fa);
+  box-shadow:0 0 14px rgba(59,130,246,0.5);
+  transition:width 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+.bar-sub { font-size:12px; color:var(--blue3); text-align:right; margin-top:5px; }
+
+/* Timer */
+.timer-dig {
+  font-size:54px; font-weight:800; text-align:center;
+  letter-spacing:-1px; padding:16px 0 10px;
+  transition:color 0.3s;
+}
+.timer-dig.on { color:var(--blue3); }
+.timer-st { text-align:center; font-size:12px; color:var(--muted); margin-bottom:16px; }
+
+.btn-big {
+  width:100%; padding:16px; border:none; border-radius:14px;
+  background:linear-gradient(135deg,#1d4ed8,#3b82f6);
+  color:#fff; font-family:'Inter',sans-serif;
+  font-size:15px; font-weight:700; cursor:pointer;
+  box-shadow:0 4px 20px rgba(37,99,235,0.35);
+  transition:all 0.2s;
+}
+.btn-big:active { transform:scale(0.98); }
+.btn-big.dim { background:linear-gradient(135deg,#1a3060,#2563eb); }
+
+.row2 { display:flex; gap:8px; margin-top:10px; }
+.btn2 {
+  flex:1; padding:12px; background:var(--surface2);
+  border:1px solid var(--border); border-radius:12px;
+  color:var(--text); font-family:'Inter',sans-serif;
+  font-size:13px; font-weight:600; cursor:pointer; transition:all 0.15s;
+}
+.btn2:hover { background:var(--blue1); }
+.btn2.green { color:var(--success); border-color:rgba(34,211,238,0.25); }
+.btn2.red { color:var(--danger); border-color:rgba(248,113,113,0.25); }
+
+/* Quick add */
+.qa { display:flex; gap:8px; }
+.qa-btn {
+  flex:1; padding:12px 8px; background:var(--surface2);
+  border:1px solid var(--border); border-radius:12px;
+  color:var(--blue3); font-family:'Inter',sans-serif;
+  font-size:13px; font-weight:700; cursor:pointer;
+  text-align:center; transition:all 0.15s;
+}
+.qa-btn:hover { background:var(--blue1); border-color:var(--blue2); transform:scale(1.04); }
+.qa-btn:active { transform:scale(0.96); }
+
+.divider { height:1px; background:var(--border); margin:16px 0; }
+
+/* Manual */
+.man-row { display:flex; gap:8px; align-items:flex-end; }
+.inp-g { flex:1; }
+.inp-g label { display:block; font-size:10px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-bottom:5px; }
+.inp-g input {
+  width:100%; background:var(--surface2); border:1px solid var(--border);
+  border-radius:10px; padding:10px 12px;
+  color:var(--text); font-family:'Inter',sans-serif; font-size:14px; outline:none;
+  transition:border-color 0.2s;
+}
+.inp-g input:focus { border-color:var(--blue2); }
+
+/* Stats */
+.stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:14px; }
+.stat {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:14px; padding:14px 10px; text-align:center;
+}
+.stat-n { font-size:26px; font-weight:800; color:var(--blue3); }
+.stat-l { font-size:10px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-top:3px; }
+
+/* Calendar */
+.cal-hd {
+  display:grid; grid-template-columns:repeat(7,1fr);
+  margin-bottom:6px;
+}
+.cal-hd span { text-align:center; font-size:9px; color:var(--muted); letter-spacing:1px; }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+.cc {
+  aspect-ratio:1; border-radius:7px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:600;
+}
+.cc.e { background:transparent; }
+.cc.f { background:rgba(255,255,255,0.02); color:rgba(255,255,255,0.15); }
+.cc.x { background:rgba(248,113,113,0.08); color:rgba(248,113,113,0.45); }
+.cc.p { background:rgba(59,130,246,0.18); color:var(--blue3); }
+.cc.d { background:linear-gradient(135deg,#1d4ed8,#3b82f6); color:#fff; }
+.cc.t { box-shadow:0 0 0 2px var(--blue3); }
+
+.legend { display:flex; gap:14px; flex-wrap:wrap; margin-top:12px; }
+.leg { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--muted); }
+.leg-dot { width:10px; height:10px; border-radius:3px; }
+
+/* Toast */
+.toast {
+  position:fixed; bottom:20px; left:50%;
+  transform:translateX(-50%) translateY(100px);
+  background:linear-gradient(135deg,#1d4ed8,#3b82f6);
+  color:#fff; padding:11px 22px; border-radius:50px;
+  font-size:13px; font-weight:600;
+  box-shadow:0 8px 30px rgba(37,99,235,0.4);
+  transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  z-index:99; white-space:nowrap;
+}
+.toast.show { transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div class="tag">Pre-Council Exam</div>
+    <h1>Study <span>Tracker</span></h1>
+    <p class="sub">3 hrs daily · Until August 1st, 2026</p>
+  </div>
+
+  <div class="countdown">
+    <div class="cd"><div class="cd-n" id="cdD">--</div><div class="cd-l">Days</div></div>
+    <div class="cd"><div class="cd-n" id="cdH">--</div><div class="cd-l">Hours</div></div>
+    <div class="cd"><div class="cd-n" id="cdM">--</div><div class="cd-l">Mins</div></div>
+  </div>
+
+  <!-- Today -->
+  <div class="card">
+    <div class="card-label">Today's Progress</div>
+    <div class="prog-row">
+      <div class="prog-time" id="todayDisp">0h 0m</div>
+      <div class="prog-goal">of 3h goal</div>
+    </div>
+    <div class="bar"><div class="bar-inner" id="barFill"></div></div>
+    <div class="bar-sub" id="barPct">0% complete</div>
+  </div>
+
+  <!-- Timer -->
+  <div class="card">
+    <div class="card-label">Live Timer</div>
+    <div class="timer-dig" id="timerDig">0:00:00</div>
+    <div class="timer-st" id="timerSt">Tap Start to begin your session</div>
+    <button class="btn-big" id="startBtn" onclick="toggleTimer()">▶&nbsp; Start Session</button>
+    <div class="row2">
+      <button class="btn2 red" onclick="resetTimer()">↺ Reset</button>
+      <button class="btn2 green" onclick="saveSession()">✓ Save</button>
+    </div>
+  </div>
+
+  <!-- Quick Add + Manual -->
+  <div class="card">
+    <div class="card-label">Quick Add</div>
+    <div class="qa">
+      <button class="qa-btn" onclick="quick(30)">+30m</button>
+      <button class="qa-btn" onclick="quick(60)">+1hr</button>
+      <button class="qa-btn" onclick="quick(90)">+1.5hr</button>
+      <button class="qa-btn" onclick="quick(180)">+3hr</button>
+    </div>
+    <div class="divider"></div>
+    <div class="card-label" style="margin-bottom:10px">Manual Log</div>
+    <div class="man-row">
+      <div class="inp-g">
+        <label>Date</label>
+        <input type="date" id="logD">
+      </div>
+      <div class="inp-g" style="max-width:64px">
+        <label>Hrs</label>
+        <input type="number" id="logH" min="0" max="12" placeholder="0">
+      </div>
+      <div class="inp-g" style="max-width:64px">
+        <label>Mins</label>
+        <input type="number" id="logM" min="0" max="59" placeholder="0">
+      </div>
+      <button class="btn2 green" style="align-self:flex-end;padding:10px 12px" onclick="manual()">Add</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat"><div class="stat-n" id="sStr">0</div><div class="stat-l">🔥 Streak</div></div>
+    <div class="stat"><div class="stat-n" id="sGoal">0</div><div class="stat-l">✅ Goals</div></div>
+    <div class="stat"><div class="stat-n" id="sTot">0h</div><div class="stat-l">📚 Total</div></div>
+  </div>
+
+  <!-- Calendar -->
+  <div class="card">
+    <div class="card-label" id="calTitle">This Month</div>
+    <div class="cal-hd">
+      <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="legend">
+      <div class="leg"><div class="leg-dot" style="background:linear-gradient(135deg,#1d4ed8,#3b82f6)"></div>Done</div>
+      <div class="leg"><div class="leg-dot" style="background:rgba(59,130,246,0.25)"></div>Partial</div>
+      <div class="leg"><div class="leg-dot" style="background:rgba(248,113,113,0.15)"></div>Missed</div>
+    </div>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const TARGET = new Date('2026-08-01T00:00:00');
+const GOAL = 180;
+const KEY = 'council_v3';
+let db = {}, timerOn=false, timerSec=0, timerInt=null;
+
+function pad(n){return String(n).padStart(2,'0');}
+function todayKey(){const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;}
+function load(){try{db=JSON.parse(localStorage.getItem(KEY))||{};}catch(e){db={};}}
+function persist(){localStorage.setItem(KEY,JSON.stringify(db));}
+function get(k){return db[k]||0;}
+function add(k,m){db[k]=Math.min(600,(db[k]||0)+Math.round(m));persist();}
+
+function countdown(){
+  const diff=TARGET-new Date();
+  if(diff<=0){['cdD','cdH','cdM'].forEach(id=>document.getElementById(id).textContent='0');return;}
+  document.getElementById('cdD').textContent=Math.floor(diff/86400000);
+  document.getElementById('cdH').textContent=Math.floor((diff%86400000)/3600000);
+  document.getElementById('cdM').textContent=Math.floor((diff%3600000)/60000);
+}
+
+function toggleTimer(){
+  const btn=document.getElementById('startBtn');
+  const dig=document.getElementById('timerDig');
+  const st=document.getElementById('timerSt');
+  if(timerOn){
+    clearInterval(timerInt);timerOn=false;
+    btn.textContent='▶  Resume Session';btn.classList.add('dim');
+    dig.classList.remove('on');st.textContent='Paused — tap Resume';
+  } else {
+    timerOn=true;
+    btn.textContent='⏸  Pause Session';btn.classList.remove('dim');
+    dig.classList.add('on');st.textContent='Session running... 📖';
+    timerInt=setInterval(()=>{
+      timerSec++;
+      const h=Math.floor(timerSec/3600),m=Math.floor((timerSec%3600)/60),s=timerSec%60;
+      dig.textContent=`${h}:${pad(m)}:${pad(s)}`;
+    },1000);
+  }
+}
+
+function resetTimer(){
+  clearInterval(timerInt);timerOn=false;timerSec=0;
+  document.getElementById('timerDig').textContent='0:00:00';
+  document.getElementById('timerDig').classList.remove('on');
+  document.getElementById('startBtn').textContent='▶  Start Session';
+  document.getElementById('startBtn').classList.remove('dim');
+  document.getElementById('timerSt').textContent='Tap Start to begin your session';
+}
+
+function saveSession(){
+  if(timerSec<60){toast('Keep going — at least 1 min!');return;}
+  add(todayKey(),timerSec/60);resetTimer();ui();toast('✅ Session saved!');
+}
+
+function quick(m){add(todayKey(),m);ui();toast(`+${m>=60?(m/60)+'hr':m+'m'} logged!`);}
+
+function manual(){
+  const d=document.getElementById('logD').value;
+  const h=parseInt(document.getElementById('logH').value)||0;
+  const m=parseInt(document.getElementById('logM').value)||0;
+  if(!d){toast('Pick a date first');return;}
+  const t=h*60+m;if(!t){toast('Enter some time!');return;}
+  add(d,t);
+  document.getElementById('logH').value='';document.getElementById('logM').value='';
+  ui();toast(`✅ ${h}h ${m}m logged!`);
+}
+
+function ui(){
+  const key=todayKey(),mins=get(key);
+  const pct=Math.min(100,Math.round(mins/GOAL*100));
+  document.getElementById('barFill').style.width=pct+'%';
+  document.getElementById('barPct').textContent=pct+'% complete';
+  document.getElementById('todayDisp').textContent=`${Math.floor(mins/60)}h ${Math.round(mins%60)}m`;
+
+  let streak=0,goals=0,total=0;
+  for(const k in db){total+=db[k];if(db[k]>=GOAL)goals++;}
+  let c=new Date();
+  while(true){
+    const k=`${c.getFullYear()}-${pad(c.getMonth()+1)}-${pad(c.getDate())}`;
+    if((db[k]||0)>=GOAL){streak++;c.setDate(c.getDate()-1);}else break;
+  }
+  document.getElementById('sStr').textContent=streak;
+  document.getElementById('sGoal').textContent=goals;
+  document.getElementById('sTot').textContent=Math.floor(total/60)+'h';
+  buildCal();
+}
+
+function buildCal(){
+  const grid=document.getElementById('calGrid');grid.innerHTML='';
+  const now=new Date(),yr=now.getFullYear(),mo=now.getMonth();
+  document.getElementById('calTitle').textContent=now.toLocaleDateString('en-NG',{month:'long',year:'numeric'});
+  const first=new Date(yr,mo,1).getDay(),days=new Date(yr,mo+1,0).getDate();
+  for(let i=0;i<first;i++){const el=document.createElement('div');el.className='cc e';grid.appendChild(el);}
+  for(let d=1;d<=days;d++){
+    const k=`${yr}-${pad(mo+1)}-${pad(d)}`;
+    const m=get(k);
+    const el=document.createElement('div');el.textContent=d;
+    const dt=new Date(yr,mo,d),td=new Date(yr,mo,now.getDate());
+    if(dt>td)el.className='cc f';
+    else if(m>=GOAL)el.className='cc d';
+    else if(m>0)el.className='cc p';
+    else el.className='cc x';
+    if(k===todayKey())el.classList.add('t');
+    if(m>0)el.title=`${Math.floor(m/60)}h ${Math.round(m%60)}m`;
+    grid.appendChild(el);
+  }
+}
+
+function toast(msg){
+  const el=document.getElementById('toast');el.textContent=msg;
+  el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+load();countdown();setInterval(countdown,30000);ui();
+document.getElementById('logD').value=todayKey();
+</script>
+</body>
+</html>
